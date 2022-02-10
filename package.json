@@ -1,0 +1,16 @@
+{
+  "name": "rollup-testing",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "rollup": "rollup src/main.js -o dist/rollup-bundle.js",
+    "vite": "vite build"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "rollup": "^2.67.2"
+  },
+  "devDependencies": {
+    "vite": "^2.8.0"
+  }
+}
