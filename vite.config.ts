@@ -1,20 +1,30 @@
 import { defineConfig } from 'vite'
 
+const plugin = () => {
+  return {
+    name: "plugin",
+    moduleParsed: function(modInfo) {
+      console.log("Parsed: ", modInfo.id, modInfo.importedIds)
+    },
+    generateBundle: function(options, bundle) {
+      console.log();
+      for (const [file, info] of Object.entries(bundle)) {
+        console.log("File: ", file)
+        console.log("Modules", info.modules || info)
+      }
+    },
+  }
+}
+
 export default defineConfig({
-  esbuild: {
-    treeShaking: false
-  },
   build: {
     target: 'esnext',
     rollupOptions: {
-      treeshake: false,
       input: {
-        main: 'src/main.js',
+        first: 'src/first.js',
+        second: 'src/second.js',
       },
-			output: {
-				entryFileNames: 'vite-bundle.js'
-			}
     }
   },
-  plugins: []
+  plugins: [plugin()]
 })
