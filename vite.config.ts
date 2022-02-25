@@ -1,17 +1,31 @@
+import react from "@vitejs/plugin-react";
 import { defineConfig } from 'vite'
 
-const plugin = () => {
+const myplugin = () => {
   return {
-    name: "plugin",
-    moduleParsed: function(modInfo) {
-      console.log("Parsed: ", modInfo.id, modInfo.importedIds)
-    },
-    generateBundle: function(options, bundle) {
-      console.log();
-      for (const [file, info] of Object.entries(bundle)) {
-        console.log("File: ", file)
-        console.log("Modules", info.modules || info)
+    name: "vite-plugin-myplugin",
+    config: function() {
+      return {
+        build: {
+          rollupOptions: {
+            input: {
+              entry: `virtual:myplugin-entry`
+            }
+          }
+        }
       }
+    },
+    resolveId: function(id) {
+      if (id === 'virtual:myplugin-entry') return `\0${id}`
+    },
+    load: function(id) {
+      if (id !== `\0virtual:myplugin-entry`) return
+
+      return `import Component from "./src/component.jsx";
+import React from "react";
+import ReactDOM from "react-dom";
+console.log("side effect to tell when this is running in the browser");
+ReactDOM.hydrate(React.createElement(Component, null), document.getElementById("react-root"));`;
     },
   }
 }
@@ -19,12 +33,9 @@ const plugin = () => {
 export default defineConfig({
   build: {
     target: 'esnext',
-    rollupOptions: {
-      input: {
-        first: 'src/first.js',
-        second: 'src/second.js',
-      },
-    }
   },
-  plugins: [plugin()]
+  plugins: [
+    react(),
+    myplugin(),
+  ]
 })
